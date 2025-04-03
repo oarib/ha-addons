@@ -14,8 +14,9 @@ RUN apt-get update && apt-get install -y \
 COPY hyperhdr-source /opt/hyperhdr
 
 WORKDIR /opt/hyperhdr
+
 RUN mkdir build && cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release .. && \
-    make -j$(nproc) && make install
-
+    make -j$(nproc) && \
+    make DESTDIR=/opt/hyperhdr-install install
 CMD ["hyperhdr"]
