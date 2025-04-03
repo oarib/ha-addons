@@ -1,16 +1,46 @@
-# Home Assistant Add-ons — OArib
+# 💡 HyperHDR Add-on for Home Assistant
 
-Dépôt personnalisé pour installer des add-ons dans Home Assistant OS.
+Run **HyperHDR** — a powerful Ambilight system — directly on your Home Assistant OS!  
+Perfect for DIY enthusiasts using Raspberry Pi + addressable LEDs.
 
-## 📦 Add-ons disponibles
+---
 
-- **HyperHDR** : Ajoute un serveur HyperHDR précompilé pour ARM64 (Raspberry Pi 4)
+## ✨ Features
 
-## 💡 Installation dans Home Assistant
+- ✅ Based on the latest stable [HyperHDR](https://github.com/awawa-dev/HyperHDR)
+- 🐳 Lightweight and precompiled for ARM64 (Raspberry Pi 4/5)
+- 🎨 LED ambient lighting effects powered by real-time HDMI capture
+- 🧠 Works with WLED controllers, grabbers, SK6812/WS2812 strips, and more
 
-1. Ouvre Home Assistant
-2. Va dans **Paramètres > Add-ons > Dépôts > Ajouter un dépôt personnalisé**
-3. Colle cette URL : https://github.com/oarib/homeassistant-addons
-5. Clique sur **"HyperHDR"** pour l’installer !
+---
+
+## 🧰 Recommended Hardware
+
+- Raspberry Pi 4 (or better)
+- Addressable LED strip (SK6812, WS2812, etc.)
+- ESP32 controller running WLED
+- Optional: HDMI splitter, video grabber, 5V power supply
+
+---
+
+## 🌐 Access the HyperHDR Web UI
+
+Once installed, open:
+
+```
+http://<homeassistant-ip>:8090
+```
+
+Use your Home Assistant device IP or `homeassistant.local`.
+
+---
+
+## 🐳 Docker Image
+
+This add-on pulls the latest image from Docker Hub:
+
+👉 [obaida/hyperhdr-aarch64](https://hub.docker.com/r/obaida/hyperhdr-aarch64)
+
+Built automatically via GitHub Actions.
 
 [![HyperHDR logo](https://raw.githubusercontent.com/oarib/ha-addons/refs/heads/master/addon-hyperhdr/logo.png)](https://www.hyperhdr.eu/)
