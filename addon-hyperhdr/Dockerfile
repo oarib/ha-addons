@@ -16,10 +16,8 @@ COPY hyperhdr-source /opt/hyperhdr
 WORKDIR /opt/hyperhdr
 RUN mkdir build && cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release .. && \
-    make -j$(nproc)
-
-# Debug: lister le contenu
-RUN ls -lh /opt/hyperhdr/build
+    make -j$(nproc) && \
+    make install
 
 # Lancer depuis le bon chemin relatif
 CMD ["build/hyperhdr"]
