@@ -1,11 +1,38 @@
-{
-  "build_from": {
-    "amd64": "homeassistant/amd64-base-debian",
-    "armhf": "homeassistant/armhf-base-raspbian",
-    "aarch64": "homeassistant/aarch64-base-debian"
-  },
-  "squash": false,
-  "args": {
-    "DOWNLOAD_URL": "https://github.com/awawa-dev/HyperHDR/releases/download"
-  }
-}
+name: Build & Push HyperHDR
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout add-on repository (ce dépôt)
+        uses: actions/checkout@v4
+
+      - name: Clone HyperHDR avec sous-modules
+        run: |
+          git clone --recurse-submodules https://github.com/awawa-dev/HyperHDR.git ./hyperhdr/hyperhdr-source
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./hyperhdr
+          file: ./hyperhdr/Dockerfile
+          platforms: linux/arm64
+          push: true
+          tags: obaida/hyperhdr-arm64:latest
