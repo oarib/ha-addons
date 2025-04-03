@@ -17,6 +17,6 @@ WORKDIR /opt/hyperhdr
 
 RUN mkdir build && cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release .. && \
-    make -j$(nproc) && \
-    make DESTDIR=/opt/hyperhdr-install install
-CMD ["hyperhdr"]
+    make -j$(nproc)
+
+CMD ["./build/hyperhdr"]
