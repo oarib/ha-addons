@@ -8,7 +8,7 @@
   "arch": ["aarch64"],
   "init": false,
   "map": ["config:rw"],
-  "image": "obaida/hyperhdr-arm64:latest",
+  "image": "obaida/hyperhdr-{arch}",
   "ports": {
     "8090/tcp": 8090,
     "19444/tcp": 19444
