@@ -21,7 +21,7 @@ WORKDIR /opt/hyperhdr
 
 RUN mkdir build && cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr .. && \
-    make -j$(nproc) && \
+    make -j$(nproc) && ls -lh && make install || (echo "❌ make install failed" && ls -lR .)
     make install
 
 CMD ["hyperhdr"]
