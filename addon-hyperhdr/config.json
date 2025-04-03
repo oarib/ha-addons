@@ -9,7 +9,7 @@
     "armhf",
     "aarch64"
   ],
-  "startup": "application",
+  "startup": "services",
   "apparmor": false,
   "boot": "auto",
   "ports": {
