@@ -1,19 +1,38 @@
-# Home Assistant Addons
+# 🧩 OArib — Home Assistant Add-ons
 
-## addon-hyperhdr
-  - HyperHDR is an open source and light weight Ambient Lighting Implementation.
-  
-  Project homesite: https://github.com/awawa-dev/HyperHDR
+Welcome to my custom Home Assistant add-ons repository — built for performance, simplicity, and full Raspberry Pi (ARM64) compatibility.
 
-***
+---
 
-## Installation instructions:
+## 📦 Available Add-ons
 
+| Add-on         | Description                                   | Architecture |
+|----------------|-----------------------------------------------|--------------|
+| **HyperHDR**   | Next-gen Ambilight system for your setup      | `aarch64`    |
 
-Or simply add this github repo `https://github.com/ihrapsa/hassio-addons.git` as a third-party add-on repository in Home Assistant **Add-on Store** then install it.
-See [here](https://www.home-assistant.io/hassio/installing_third_party_addons/) for more details on how to do that
+---
 
-## Credits:
-- [awawa-dev](https://github.com/awawa-dev/HyperHDR) for HyperHDR  
-- [bradsjm](https://github.com/bradsjm/hassio-addons) for hassio-addon template  
-- [appleimperio](https://github.com/appleimperio/docker-hyperhdr) for HyperHDR dockerfile  
+## 🚀 How to Add This Repository to Home Assistant
+
+1. Open **Home Assistant**
+2. Go to **Settings → Add-ons → Add-on Store**
+3. Click the **three dots (⋮)** in the top-right → **Repositories**
+4. Add this URL:
+
+```
+https://github.com/oarib/ha-addons
+```
+
+5. Click **HyperHDR** from the list to install it 🎉
+
+---
+
+## 🔁 Auto-Update Powered by GitHub Actions
+
+This repository is fully automated:
+
+- 🔄 Clones the latest [HyperHDR](https://github.com/awawa-dev/HyperHDR) code daily
+- 🛠 Builds a multi-arch Docker image (`aarch64`)
+- 🚀 Pushes to [Docker Hub](https://hub.docker.com/u/obaida)
+
+You always get the freshest version, no manual work needed ✅
