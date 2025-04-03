@@ -1,5 +1,5 @@
 {
-  "name": "Jonah's Home Assistant Add-Ons",
-  "url": "https://github.com/ihrapsa/hassio-addons",
-  "maintainer": "Iona Hrapsa <hrapsaiona@gmail.com>"
+  "name": "OArib Add-ons Repository",
+  "url": "https://github.com/oarib/homeassistant-addons",
+  "maintainer": "OArib"
 }
