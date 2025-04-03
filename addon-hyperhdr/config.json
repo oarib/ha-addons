@@ -1,6 +1,6 @@
 {
   "name": "HyperHDR",
-  "version": "auto",
+  "version": "21.0.0.0",
   "slug": "hyperhdr",
   "description": "HyperHDR Ambilight prebuilt for ARM64",
   "startup": "services",
