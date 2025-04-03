@@ -13,4 +13,4 @@ Dépôt personnalisé pour installer des add-ons dans Home Assistant OS.
 3. Colle cette URL : https://github.com/oarib/homeassistant-addons
 5. Clique sur **"HyperHDR"** pour l’installer !
 
-[![HyperHDR logo](https://raw.githubusercontent.com/ihrapsa/hassio-addons/master/addon-hyperhdr/logo.png)](https://www.hyperhdr.eu/)
+[![HyperHDR logo](https://raw.githubusercontent.com/oarib/ha-addons/refs/heads/master/addon-hyperhdr/logo.png)](https://www.hyperhdr.eu/)
