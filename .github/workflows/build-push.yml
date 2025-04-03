@@ -35,4 +35,4 @@ jobs:
           file: ./hyperhdr/Dockerfile
           platforms: linux/arm64
           push: true
-          tags: obaida/hyperhdr-arm64:latest
+          tags: obaida/hyperhdr-aarch64:latest
