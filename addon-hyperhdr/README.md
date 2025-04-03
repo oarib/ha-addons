@@ -1,4 +1,4 @@
-# 💡 HyperHDR Add-on for Home Assistant
+# 💡📺 HyperHDR Add-on for Home Assistant
 
 Run **HyperHDR** — a powerful Ambilight system — directly on your Home Assistant OS!  
 Perfect for DIY enthusiasts using Raspberry Pi + addressable LEDs.
