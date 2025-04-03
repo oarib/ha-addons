@@ -31,7 +31,7 @@
   "map": [
     "config:rw"
   ],
-  "image": "obaida/hyperhdr-arm64:latest",
+  "image": "jonah1024/hyperhdr-addon-{arch}",
   "options": {},
   "schema": {},
   "privileged": [
