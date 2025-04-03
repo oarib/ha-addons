@@ -1,4 +1,3 @@
-#!/usr/bin/with-contenv bashio
+#!/usr/bin/with-contenv bash
 
-mkdir -p /config/hyperhdr
-/usr/bin/hyperhdr -v -u /config/hyperhdr
+exec /usr/bin/hyperhdr
