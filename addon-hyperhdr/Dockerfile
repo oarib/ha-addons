@@ -19,4 +19,4 @@ RUN mkdir build && cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release .. && \
     make -j$(nproc)
 
-CMD ["./build/hyperhdr"]
+CMD ["/opt/hyperhdr/build/hyperhdr"]
