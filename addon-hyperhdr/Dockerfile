@@ -12,14 +12,16 @@ RUN apt-get update && apt-get install -y \
     libudev-dev libasound2-dev \
     libglvnd-dev libv4l-dev \
     pkg-config tzdata \
+    libssl-dev flatbuffers-compiler libflatbuffers-dev libzstd-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY hyperhdr-source /opt/hyperhdr
 
 WORKDIR /opt/hyperhdr
+
 RUN mkdir build && cd build && \
-    cmake -DCMAKE_INSTALL_PREFIX=/opt/hyperhdr .. && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr .. && \
+    make -j$(nproc) && \
     make install
 
-CMD ["/opt/hyperhdr/bin/hyperhdr"]
-
+CMD ["hyperhdr"]
