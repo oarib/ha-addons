@@ -2,18 +2,20 @@
   "name": "HyperHDR",
   "version": "latest",
   "slug": "hyperhdr",
-  "description": "HyperHDR Ambilight prebuilt for ARM64",
-  "startup": "services",
+  "description": "Next-gen Ambilight system for your TV setup with grabber and WLED support.",
+  "startup": "application",
   "boot": "auto",
-  "arch": ["aarch64"],
-  "init": false,
-  "map": ["config:rw"],
-  "image": "obaida/hyperhdr-{arch}",
-  "ports": {
-    "8090/tcp": 8090,
-    "19444/tcp": 19444
-  },
-  "webui": "http://[HOST]:[PORT:8090]",
   "ingress": false,
-  "panel_icon": "mdi:television-ambient-light"
+  "panel_icon": "mdi:led-strip-variant",
+  "panel_title": "HyperHDR",
+  "host_network": true,
+  "full_access": true,
+  "privileged": ["SYS_ADMIN", "NET_ADMIN"],
+  "devices": [
+    "/dev/video0:/dev/video0:rwm"
+  ],
+  "map": ["config:rw", "ssl", "media:rw"],
+  "options": {},
+  "schema": {},
+  "image": "obaida/hyperhdr-{arch}"
 }
