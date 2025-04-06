@@ -19,14 +19,18 @@ jobs:
       - name: Check if image already exists on Docker Hub
         id: check_existing
         run: |
-          tags=$(curl --silent https://hub.docker.com/v2/repositories/obaida/hyperhdr/tags/ | jq -r '.results[].name')
-          if echo "$tags" | grep -q "^${{ env.latest_version }}$"; then
-            echo "Image for version ${{ env.latest_version }} already exists."
+          tags=$(curl --silent https://hub.docker.com/v2/repositories/obaida/hyperhdr/tags/ || echo "")
+          if [ -z "$tags" ] || ! echo "$tags" | jq -e .results > /dev/null; then
+            echo "Could not get tags from Docker Hub. Assuming build is needed."
+            echo "build_needed=true" >> $GITHUB_ENV
+          elif echo "$tags" | jq -r '.results[].name' | grep -q "^${{ env.latest_version }}$"; then
+            echo "Image already exists."
             echo "build_needed=false" >> $GITHUB_ENV
           else
             echo "Image not found. Build is required."
             echo "build_needed=true" >> $GITHUB_ENV
           fi
+    
 
       - name: Clone HyperHDR source with submodules
         if: env.build_needed == 'true'
