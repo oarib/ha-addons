@@ -3,7 +3,10 @@ name: check-and-build
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 2 * * *"
+    - cron: "0 2 * * *"  # Daily at 2AM
+
+env:
+  IMAGE_NAME: obaida/hyperhdr
 
 jobs:
   check-and-build:
@@ -22,7 +25,7 @@ jobs:
       - name: Check if Docker image already exists
         id: docker_tag_check
         run: |
-          tag_exists=$(curl -s https://hub.docker.com/v2/repositories/obaida/hyperhdr-aarch64/tags/${{ env.latest_version }}) 
+          tag_exists=$(curl -s https://hub.docker.com/v2/repositories/${{ env.IMAGE_NAME }}/tags/${{ env.latest_version }})
           if echo "$tag_exists" | jq -e '.name' >/dev/null; then
             echo "Image already exists. Skipping build."
             echo "skip_build=true" >> "$GITHUB_ENV"
@@ -60,7 +63,17 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           tags: |
-            obaida/hyperhdr-aarch64:${{ env.latest_version }}
-            obaida/hyperhdr-aarch64:latest
+            ${{ env.IMAGE_NAME }}:${{ env.latest_version }}
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}-aarch64:${{ env.latest_version }}
+            ${{ env.IMAGE_NAME }}-aarch64:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Build summary
+        if: env.skip_build == 'false'
+        run: echo "✅ HyperHDR ${{ env.latest_version }} built and pushed."
+
+      - name: Skip summary
+        if: env.skip_build == 'true'
+        run: echo "ℹ️ No new stable release. Build skipped."
