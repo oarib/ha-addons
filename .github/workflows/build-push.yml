@@ -3,56 +3,66 @@ name: Build & Push HyperHDR
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 2 * * *"  # Vérifie chaque jour à 2h du matin
+    - cron: "0 2 * * *"  # Check every day at 2 AM UTC
 
 jobs:
   check-and-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Vérifier la dernière version stable de HyperHDR
+      - name: Fetch latest stable HyperHDR version
         id: check_version
         run: |
           latest_version=$(curl --silent "https://api.github.com/repos/awawa-dev/HyperHDR/releases/latest" | jq -r .tag_name)
+          echo "Latest stable version: $latest_version"
           echo "latest_version=$latest_version" >> $GITHUB_ENV
 
-      - name: Vérifier si une nouvelle version doit être construite
-        id: should_build
+      - name: Check if image already exists on Docker Hub
+        id: check_existing
         run: |
-          docker_tags=$(curl --silent "https://hub.docker.com/v2/repositories/obaida/hyperhdr/tags/")
-          if echo "$docker_tags" | grep -q "\"name\": \"$latest_version\""; then
+          tags=$(curl --silent https://hub.docker.com/v2/repositories/obaida/hyperhdr/tags/ | jq -r '.results[].name')
+          if echo "$tags" | grep -q "^${{ env.latest_version }}$"; then
+            echo "Image for version ${{ env.latest_version }} already exists."
             echo "build_needed=false" >> $GITHUB_ENV
           else
+            echo "Image not found. Build is required."
             echo "build_needed=true" >> $GITHUB_ENV
           fi
 
-      - name: Cloner le dépôt HyperHDR
+      - name: Clone HyperHDR source with submodules
         if: env.build_needed == 'true'
         run: |
-          git clone --branch ${{ env.latest_version }} --recurse-submodules https://github.com/awawa-dev/HyperHDR.git ./addon-hyperhdr/hyperhdr-source
+          git clone --branch ${{ env.latest_version }} --recurse-submodules https://github.com/awawa-dev/HyperHDR.git hyperhdr-source
+          mv hyperhdr-source addon-hyperhdr
 
-      - name: Configurer QEMU
+      - name: Set up QEMU
         if: env.build_needed == 'true'
         uses: docker/setup-qemu-action@v3
 
-      - name: Configurer Docker Buildx
+      - name: Set up Docker Buildx
         if: env.build_needed == 'true'
         uses: docker/setup-buildx-action@v3
 
-      - name: Se connecter à Docker Hub
+      - name: Login to Docker Hub
         if: env.build_needed == 'true'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Construire et pousser l'image Docker multi-architecture
+      - name: Debug – Show addon-hyperhdr contents
+        if: env.build_needed == 'true'
+        run: ls -R ./addon-hyperhdr
+
+      - name: Build & Push multi-arch Docker image (with cache)
         if: env.build_needed == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./addon-hyperhdr
-          file: ./addon-hyperhdr/Dockerfile
+          file: Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
-          tags: obaida/hyperhdr:${{ env.latest_version }}
+          tags: |
+            obaida/hyperhdr:latest
+            obaida/hyperhdr:${{ env.latest_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
