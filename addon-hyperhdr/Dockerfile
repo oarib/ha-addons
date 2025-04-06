@@ -1,4 +1,4 @@
-# Stage 1: Build HyperHDR
+# ---------- Stage 1: Build ----------
 FROM ubuntu:22.04 AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -21,10 +21,9 @@ COPY hyperhdr-source/ .
 
 RUN mkdir build && cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr .. && \
-    make -j$(nproc) && \
-    make install || (echo "❌ make install failed" && ls -lR .)
+    make -j$(nproc) && make install
 
-# Stage 2: Runtime only
+# ---------- Stage 2: Runtime ----------
 FROM ubuntu:22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -43,7 +42,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=builder /usr /usr
 
-# Optional (if web UI or webserver is expected)
 EXPOSE 8090 8092 19400 19444 19445 19333
 
 CMD ["hyperhdr"]
