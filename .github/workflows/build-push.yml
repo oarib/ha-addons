@@ -3,40 +3,50 @@ name: Build & Push HyperHDR
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 2 * * *"  # Check every day at 2 AM UTC
+    - cron: "0 2 * * *"  # Check daily at 2AM UTC
 
 jobs:
   check-and-build:
     runs-on: ubuntu-latest
+
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Fetch latest stable HyperHDR version
-        id: check_version
+        id: get_version
         run: |
           latest_version=$(curl --silent "https://api.github.com/repos/awawa-dev/HyperHDR/releases/latest" | jq -r .tag_name)
-          echo "Latest stable version: $latest_version"
           echo "latest_version=$latest_version" >> $GITHUB_ENV
 
-      - name: Check if image already exists on Docker Hub
-        id: check_existing
+      - name: Check if version already exists on Docker Hub
+        id: check_dockerhub
         run: |
           tags=$(curl --silent https://hub.docker.com/v2/repositories/obaida/hyperhdr/tags/ || echo "")
           if [ -z "$tags" ] || ! echo "$tags" | jq -e .results > /dev/null; then
-            echo "Could not get tags from Docker Hub. Assuming build is needed."
+            echo "Could not read tags from Docker Hub, will build."
             echo "build_needed=true" >> $GITHUB_ENV
           elif echo "$tags" | jq -r '.results[].name' | grep -q "^${{ env.latest_version }}$"; then
-            echo "Image already exists."
+            echo "Image for version ${{ env.latest_version }} already exists."
             echo "build_needed=false" >> $GITHUB_ENV
           else
-            echo "Image not found. Build is required."
+            echo "Image not found, build needed."
             echo "build_needed=true" >> $GITHUB_ENV
           fi
-    
 
-      - name: Clone HyperHDR source with submodules
+      - name: Clone HyperHDR source (with submodules)
         if: env.build_needed == 'true'
         run: |
           git clone --branch ${{ env.latest_version }} --recurse-submodules https://github.com/awawa-dev/HyperHDR.git hyperhdr-source
-          mv hyperhdr-source addon-hyperhdr
+          cp -r hyperhdr-source/* addon-hyperhdr/
+
+      - name: Confirm Dockerfile presence
+        if: env.build_needed == 'true'
+        run: |
+          echo "Checking for Dockerfile in addon-hyperhdr/"
+          find addon-hyperhdr -name Dockerfile
+          echo "Listing addon-hyperhdr directory:"
+          ls -la addon-hyperhdr
 
       - name: Set up QEMU
         if: env.build_needed == 'true'
@@ -53,16 +63,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Debug – Show addon-hyperhdr contents
-        if: env.build_needed == 'true'
-        run: ls -R ./addon-hyperhdr
-
       - name: Build & Push multi-arch Docker image (with cache)
         if: env.build_needed == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./addon-hyperhdr
-          file: Dockerfile
+          file: ./addon-hyperhdr/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           tags: |
