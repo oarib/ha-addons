@@ -1,9 +1,13 @@
+# ----------------------
+# Updated GitHub Actions Workflow
+# ----------------------
+
 name: check-and-build
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 2 * * *"  # Daily at 2AM
+    - cron: "0 2 * * *"
 
 env:
   IMAGE_NAME: obaida/hyperhdr
@@ -11,6 +15,18 @@ env:
 jobs:
   check-and-build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            platform: linux/amd64
+            base_image: ubuntu:22.04
+          - arch: arm64
+            platform: linux/arm64
+            base_image: arm64v8/ubuntu:22.04
+          - arch: armv7
+            platform: linux/arm/v7
+            base_image: arm32v7/ubuntu:22.04
 
     steps:
       - name: Checkout repository
@@ -25,12 +41,10 @@ jobs:
       - name: Check if Docker image already exists
         id: docker_tag_check
         run: |
-          tag_exists=$(curl -s https://hub.docker.com/v2/repositories/${{ env.IMAGE_NAME }}/tags/${{ env.latest_version }})
+          tag_exists=$(curl -s https://hub.docker.com/v2/repositories/${{ env.IMAGE_NAME }}-${{ matrix.arch }}/tags/${{ env.latest_version }})
           if echo "$tag_exists" | jq -e '.name' >/dev/null; then
-            echo "Image already exists. Skipping build."
             echo "skip_build=true" >> "$GITHUB_ENV"
           else
-            echo "Image does not exist. Proceeding to build."
             echo "skip_build=false" >> "$GITHUB_ENV"
           fi
 
@@ -54,26 +68,26 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build & Push multi-arch Docker image with cache
+      - name: Build & Push image for ${{ matrix.arch }}
         if: env.skip_build == 'false'
         uses: docker/build-push-action@v5
         with:
           context: ./addon-hyperhdr
           file: ./addon-hyperhdr/Dockerfile
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: ${{ matrix.platform }}
           push: true
+          build-args: |
+            BASE_IMAGE=${{ matrix.base_image }}
           tags: |
-            ${{ env.IMAGE_NAME }}:${{ env.latest_version }}
-            ${{ env.IMAGE_NAME }}:latest
-            ${{ env.IMAGE_NAME }}-aarch64:${{ env.latest_version }}
-            ${{ env.IMAGE_NAME }}-aarch64:latest
+            ${{ env.IMAGE_NAME }}-${{ matrix.arch }}:${{ env.latest_version }}
+            ${{ env.IMAGE_NAME }}-${{ matrix.arch }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Build summary
         if: env.skip_build == 'false'
-        run: echo "✅ HyperHDR ${{ env.latest_version }} built and pushed."
+        run: echo "✅ HyperHDR ${{ env.latest_version }} built and pushed for ${{ matrix.arch }}"
 
       - name: Skip summary
         if: env.skip_build == 'true'
-        run: echo "ℹ️ No new stable release. Build skipped."
+        run: echo "ℹ️ No new stable release. Build skipped for ${{ matrix.arch }}"
