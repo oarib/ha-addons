@@ -1,4 +1,9 @@
-FROM ubuntu:22.04
+# ----------------------
+# Updated Dockerfile
+# ----------------------
+
+ARG BASE_IMAGE=ubuntu:22.04
+FROM ${BASE_IMAGE}
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
@@ -16,15 +21,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl-dev flatbuffers-compiler libflatbuffers-dev libzstd-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy source files
 COPY hyperhdr-source /opt/hyperhdr
 WORKDIR /opt/hyperhdr
 
-# Build HyperHDR
 RUN mkdir build && cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr .. && \
     make -j$(nproc) && \
     make install
 
-# Run HyperHDR
 CMD ["hyperhdr"]
