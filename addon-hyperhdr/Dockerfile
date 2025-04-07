@@ -2,8 +2,7 @@
 # Updated Dockerfile
 # ----------------------
 
-ARG BASE_IMAGE=ubuntu:22.04
-FROM ${BASE_IMAGE}
+FROM ubuntu:22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
@@ -21,12 +20,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl-dev flatbuffers-compiler libflatbuffers-dev libzstd-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy source files
 COPY hyperhdr-source /opt/hyperhdr
 WORKDIR /opt/hyperhdr
 
+# Build HyperHDR with verbose logs
 RUN mkdir build && cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr .. && \
-    make -j$(nproc) && \
-    make install
+    make -j$(nproc) VERBOSE=1 && \
+    make install || ( \
+        echo "❌ INSTALL FAILED - Listing content:" && \
+        find . && \
+        ls -lR /opt/hyperhdr/build && \
+        ls -lR /usr/local /usr \
+    )
 
-CMD ["hyperhdr"]
+# Keep the container running to inspect manually if needed (for testing only)
+CMD ["bash"]
